@@ -64,6 +64,7 @@ except ImportError:
 import re
 import warnings
 import array
+import pickle
 from libc.errno  cimport errno, EPIPE
 from libc.string cimport strcmp, strpbrk, strerror
 from libc.stdint cimport INT32_MAX
@@ -2925,6 +2926,16 @@ cdef class IndexedReads:
             self.htsfile = self.samfile.htsfile
             self.header = samfile.header
             self.owns_samfile = False
+
+    def store(self, filename):
+        '''Save the index to disk, in the specified filename, using pickle dump.'''
+        with open(filename, 'wb') as f:
+            pickle.dump(self.index, f)
+
+    def load(self, filename):
+        '''Load the index from disk, in the specified filename, using pickle load.'''
+        with open(filename, 'rb') as f:
+            self.index = pickle.load(f)
 
     def build(self):
         '''build the index.'''
